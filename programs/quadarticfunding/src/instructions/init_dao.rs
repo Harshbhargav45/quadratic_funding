@@ -1,4 +1,6 @@
 use anchor_lang::prelude::*;
+use anchor_lang::Discriminator;
+use anchor_spl::token_interface::Mint;
 
 use crate::Dao;
 
@@ -17,6 +19,8 @@ pub struct InitDao<'info> {
     )]
     pub dao_account: Account<'info, Dao>,
 
+    pub mint: InterfaceAccount<'info, Mint>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -25,6 +29,7 @@ impl<'info> InitDao<'info> {
         self.dao_account.set_inner(Dao {
             name,
             authority: self.creator.key(),
+            mint: self.mint.key(),
             proposal_count: 0,
             bump: bumps.dao_account,
         });

@@ -6,6 +6,7 @@ pub struct Dao {
     #[max_len(50)]
     pub name: String,
     pub authority: Pubkey,
+    pub mint: Pubkey,
     pub proposal_count: u64,
     pub bump: u8,
 }

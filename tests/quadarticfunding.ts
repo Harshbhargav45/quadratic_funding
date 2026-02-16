@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor"
 import { Program } from "@coral-xyz/anchor"
 import { QuadraticFunding } from "../target/types/quadratic_funding"
-import { Keypair, PublicKey } from "@solana/web3.js"
+import { Keypair, PublicKey, Transaction, SystemProgram } from "@solana/web3.js"
 import { createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import assert from "assert"
 
@@ -23,14 +23,21 @@ describe("quadratic_funding", () => {
 
   before("Setup accounts", async () => {
     // Airdrop to voter
-    const sig = await connection.requestAirdrop(voter.publicKey, 5_000_000_000)
-    await connection.confirmTransaction(sig)
+    // Transfer SOL from creator to voter
+    const transferTx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: creator.publicKey,
+        toPubkey: voter.publicKey,
+        lamports: 100_000_000, // 0.1 SOL
+      })
+    );
+    await provider.sendAndConfirm(transferTx);
 
-      // Derive DAO PDA
-      ;[daoPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("dao"), creator.publicKey.toBuffer(), Buffer.from(daoName)],
-        program.programId,
-      )
+    // Derive DAO PDA
+    ;[daoPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("dao"), creator.publicKey.toBuffer(), Buffer.from(daoName)],
+      program.programId,
+    )
 
     // Derive Proposal PDA (proposal_count = 0 for the first proposal)
     const proposalCount = new anchor.BN(0)
@@ -60,6 +67,7 @@ describe("quadratic_funding", () => {
       .initDao(daoName)
       .accounts({
         creator: creator.publicKey,
+        mint: mint,
       })
       .rpc()
 

@@ -6,7 +6,7 @@ pub use instructions::*;
 pub mod state;
 pub use state::*;
 
-declare_id!("D1AtSk1MYWSv6PCg2GzpaDwoKNxtXxKKeToFuSs5DYq2");
+declare_id!("7yNasv9KUmJCaicxhhKjuMcoaXPjTNNmiCoGny9NRxBs");
 
 #[program]
 pub mod quadratic_funding {

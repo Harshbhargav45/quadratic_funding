@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::Discriminator;
 use anchor_spl::token_interface::{TokenAccount, TokenInterface};
 
 use crate::{Dao, Proposal, Vote};
@@ -25,6 +26,7 @@ pub struct CastVote<'info> {
     #[account(
         mut,
         token::authority = voter,
+        token::mint = dao_account.mint,
     )]
     pub creator_token_account: InterfaceAccount<'info, TokenAccount>,
 
